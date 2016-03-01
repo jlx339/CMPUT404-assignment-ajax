@@ -6,7 +6,7 @@
     <meta content='width=device-width; height=device-height; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;' name='viewport' />
     <meta name="viewport" content="width=device-width" />
     <meta name="license" content="
-        Copyright 2013 Abram Hindle
+        Copyright 2016 Lixin Jin, Abram Hindle
         
         Licensed under the Apache License, Version 2.0 (the "License");
         you may not use this file except in compliance with the License.
@@ -40,11 +40,14 @@ function sendJSONXMLHTTPRequest(url, objects, callback) {
                 if (xhr.status==200) {
                     //XXX: parse some JSON from the request!
                     //XXX: Pass the data to the callback!
-		    		 	  callback(JSON.parase(xhr.responseText));
+                    var v = JSON.parse(xhr.responseText);
+                    		if (callback) {
+									callback(v)                    		
+                    		}
                 }
             } 
             catch(e) {
-                alert('Error: ' + e.name);
+                //alert('Error: ' + e.name);
             }
         }
     };
@@ -52,8 +55,8 @@ function sendJSONXMLHTTPRequest(url, objects, callback) {
     //XXX: set the mimetype and the accept headers!
     // Remember to use application/json !
     xhr.open("POST", url, true);
-    xhr.setRequestHeader("Accept","application/json");
-    xhr.setRequestHeader("Content-type","application/json");
+    xhr.setRequestHeader("Accept","*/*");
+    xhr.setRequestHeader("Content-Type","application/json");
     xhr.send(JSON.stringify(objects));
 }
 
@@ -69,6 +72,8 @@ function drawCircle(context,entity) {
         var y = entity["y"];
         //moveTo(x,y);
         fillStyle = entity["colour"];
+        context.shadowColor='#ffff80';
+		  context.shadowBlur=5;
         strokeStyle = fillStyle;
         arc(x, y, (entity["radius"])?entity["radius"]:50, 0, 2.0 * Math.PI, false);  
         stroke();                                
@@ -143,7 +148,7 @@ function addEntity(entity, data) {
     world[entity] = data;
     //drawNextFrame(); // (but should we?)
     //XXX: Send a XHTML Request that updates the entity you just  modified!
-    sendJSONXMLHTTPRequest("/entity/" + encodeURIComponent(entity), data);
+    sendJSONXMLHTTPRequest("/entity/" + entity, data, function(v){});
 
 }
 
@@ -252,16 +257,30 @@ mouse = (function() {
 
 // Add the application specific mouse listeners!
 //XXX: TODO Make these prettier!
+// Random Color cited from : http://stackoverflow.com/questions/1484506/random-color-generator-in-javascript
+var letters = '0123456789ABCDEF'.split('');
 mouse.mousedowners.push(function(x,y,clicked,e) {
-    addEntityWithoutName({'x':x,'y':y,'colour':'blue'});
+	var color = '#';
+	for (var i = 0; i < 6 i ++) {
+		color += letters[Math.floor(Math.random()*16)];	
+	}
+    addEntityWithoutName({'x':x,'y':y,'colour':color});
 });
 
 mouse.mouseuppers.push(function(x,y,clicked,e) {
-    addEntityWithoutName({'x':x,'y':y,'colour':'red'});
+	var color = '#';
+	for (var i = 0; i < 6 i ++) {
+		color += letters[Math.floor(Math.random()*16)];	
+	}	
+    addEntityWithoutName({'x':x,'y':y,'colour':color});
 });
 
 mouse.mousedraggers.push(function(x,y,clicked,e) {
-    addEntityWithoutName({'x':x,'y':y,'colour':'green',
+	var color = '#';
+	for (var i = 0; i < 6 i ++) {
+		color += letters[Math.floor(Math.random()*16)];	
+	}	
+    addEntityWithoutName({'x':x,'y':y,'colour': color,
                           'radius':10});
 });
 
